@@ -2,7 +2,6 @@ import os, argparse, base64, logging
 from flask import Flask, abort, json, send_file, request
 from formater import Formatter
 
-BASE_PATH    = None
 LINPEAS_PATH = None
 SHELL_PATH   = "shell.sh" 
 
